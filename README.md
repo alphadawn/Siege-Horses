@@ -75,78 +75,24 @@ To cancel before the battle, click the **"Cancel cavalry …"** option that appe
 
 ---
 
-## Key APIs
+## How It Works (For Modders)
 
-### Cavalry Cap Enforcement at Spawn Time
+This mod uses three key techniques to make cavalry work in sieges:
 
-```csharp
-// NoHorsesPatch intercepts every AgentBuildData.NoHorses call.
-// It counts cavalry per side and only allows horses up to the cap.
-// Once the cap is reached, noHorses stays true — remaining troops
-// spawn as infantry from the start. After 60 ticks the flag is
-// disabled so wave reinforcements never get horses.
+### 1. Intercepting `NoHorses` at Spawn Time
+Bannerlord calls `AgentBuildData.NoHorses(true)` for **every troop** during siege spawning. We patch it and set `noHorses = false`, allowing horses up to the configured cap per side. Cavalry that exceed the cap keep `noHorses = true` and spawn as infantry from the start — no wasteful spawn-and-dismount cycle.
 
-if (currentCount >= cap) return;  // cap reached — leave noHorses = true
-noHorses = false;
-counter++;
-```
+### 2. Wave Safety via Patch Disable
+After 60 ticks (when initial troops have spawned), we set `SiegeHorsesFlag.GoWithCavalry = false`. This disables the `NoHorses` patch, so all future spawns (wave reinforcements armies) get `noHorses = true` naturally. No periodic scanning needed.
 
-### Disabling the Patch for Wave Reinforcements
+### 3. Fixing the "Floating Rider" Bug
+When a mount is killed mid-battle, the rider stays stuck at horse height with a frozen riding animation. We fix this with a three-step dismount:
+1. **Kill the mount** (`MakeDead`) so it disappears
+2. **Reset the action channel** (`SetActionChannel(0, act_none)`) to break the riding pose
+3. **Teleport to ground level** — we find the Z of any nearby dismounted ally as a ground reference, then `TeleportToPosition` only if the rider is >0.5m above it. Riders who snap naturally are left alone.
 
-```csharp
-// In SiegeCavalryMissionBehavior.OnMissionTick, after the initial
-// cavalry has spawned (60 ticks):
-SiegeHorsesFlag.GoWithCavalry = false;
-// NoHorsesPatch stops running → all future spawns get noHorses = true.
-```
-
-### Dismounting Excess Cavalry
-
-```csharp
-// Cavalry that exceed the cap are dismounted by killing their mount,
-// resetting the action channel (to fix the frozen riding animation),
-// and teleporting the rider to ground level (to fix floating in air).
-
-mount.MakeDead(false, ActionIndexCache.act_none, 0);
-rider.SetActionChannel(0, ActionIndexCache.act_none, true, default(AnimFlags), ...);
-rider.TeleportToPosition(new Vec3(pos.X, pos.Y, groundZ));
-```
-
-### Auto Formation Split
-
-```csharp
-// Player cavalry is split into melee cavalry (Formation 7) and horse archers
-// (Formation 6) based on whether they have a bow, crossbow, or thrown weapon.
-
-foreach (Agent agent in mountedAgents)
-{
-    bool hasRanged = HasRangedWeapon(agent);
-    agent.Formation = hasRanged ? horseArcherFormation : meleeCavFormation;
-}
-```
-
-### Allowing Horses in Siege Missions
-
-```csharp
-// AgentBuildData.NoHorses(bool) is called during every agent spawn.
-// In siege missions, the game passes noHorses = true to strip mounts.
-// A Harmony Prefix intercepts this and sets noHorses = false when
-// the flag is active and the cap hasn't been reached yet.
-
-[HarmonyPatch(typeof(AgentBuildData), nameof(AgentBuildData.NoHorses))]
-public static class NoHorsesPatch
-{
-    static void Prefix(AgentBuildData __instance, ref bool noHorses)
-    {
-        if (!noHorses) return;
-        if (!SiegeHorsesFlag.GoWithCavalry) return;
-        // Count cavalry per side, check cap, enemy mode, etc.
-        if (currentCount >= cap) return;
-        noHorses = false;  // spawn the horse
-        counter++;
-    }
-}
-```
+### Formation Split
+Player cavalry is assigned to custom formations (FormationClass.LightCavalry = 6, HeavyCavalry = 7). We check each agent's weapons — any ranged weapon (bow, crossbow, thrown) → Horse Archers, otherwise → Melee Cavalry.
 
 ---
 
