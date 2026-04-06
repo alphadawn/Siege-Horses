@@ -1,0 +1,22 @@
+<Module>
+  <Name value="Siege Horses"/>
+  <Id value="SiegeHorses"/>
+  <Version value="v1.0.0"/>
+  <SingleplayerModule value="true"/>
+  <MultiplayerModule value="false"/>
+  <SubModules>
+    <SubModule>
+      <Name value="SiegeHorses"/>
+      <DLLName value="SiegeHorses.dll"/>
+      <SubModuleClassType value="SiegeHorses.SiegeHorsesSubModule"/>
+      <Assemblies/>
+    </SubModule>
+  </SubModules>
+  <Xmls/>
+  <DependedModules>
+    <DependedModule Id="Native"/>
+    <DependedModule Id="SandBoxCore"/>
+    <DependedModule Id="Sandbox"/>
+    <DependedModule Id="StoryMode" Optional="true"/>
+  </DependedModules>
+</Module>

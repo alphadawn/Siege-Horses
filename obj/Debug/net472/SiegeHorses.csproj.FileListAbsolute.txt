@@ -1,0 +1,12 @@
+C:\Users\Ibrahim\Documents\Siege Horses\obj\Debug\net472\SiegeHorses.csproj.AssemblyReference.cache
+C:\Users\Ibrahim\Documents\Siege Horses\obj\Debug\net472\SiegeHorses.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Ibrahim\Documents\Siege Horses\obj\Debug\net472\SiegeHorses.AssemblyInfoInputs.cache
+C:\Users\Ibrahim\Documents\Siege Horses\obj\Debug\net472\SiegeHorses.AssemblyInfo.cs
+C:\Users\Ibrahim\Documents\Siege Horses\obj\Debug\net472\SiegeHorses.csproj.CoreCompileInputs.cache
+C:\Users\Ibrahim\Documents\Siege Horses\bin\Debug\net472\SiegeHorses.dll
+C:\Users\Ibrahim\Documents\Siege Horses\bin\Debug\net472\SiegeHorses.pdb
+C:\Users\Ibrahim\Documents\Siege Horses\bin\Debug\net472\0Harmony.dll
+C:\Users\Ibrahim\Documents\Siege Horses\obj\Debug\net472\SiegeHor.341B82E2.Up2Date
+C:\Users\Ibrahim\Documents\Siege Horses\obj\Debug\net472\SiegeHorses.dll
+C:\Users\Ibrahim\Documents\Siege Horses\obj\Debug\net472\SiegeHorses.pdb
+C:\Users\Ibrahim\Documents\Siege Horses\bin\Debug\net472\MCMv5.dll
